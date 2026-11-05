@@ -1,121 +1,110 @@
+# Usage (run from scripts/src; make_splits.py must have written splits.json):
+#   python preprocess_cli.py cache --manifest splits.json --data-dir ../../../chest_xray --cache-dir ../../../chest_xray_cache --size 224
+#   python preprocess_cli.py eda --manifest splits.json --cache-dir ../../../chest_xray_cache --size 224 --plot-out eda.png
+#   python preprocess_cli.py verify-batch --manifest splits.json --cache-dir ../../../chest_xray_cache --size 224 --split train
+# cache: resize every image once and store uint8 arrays | eda: class counts and intensity outliers | verify-batch: inspect a batch
 import argparse
-from pathlib import Path
+
+import numpy as np
+
 from preprocess import (
-    DatasetExploration,
-    SplitPathLoader,
-    PneumoniaSequenceDataset,
+    SPLITS,
+    build_cache,
+    build_dataset,
+    class_distribution,
+    class_weights,
+    intensity_outliers,
+    load_manifest,
+    load_split,
+    plot_eda,
 )
 
 
+def parse_args():
+  parser = argparse.ArgumentParser()
+  commands = parser.add_subparsers(dest="command", required=True)
+
+  def shared(command):
+    command.add_argument("--manifest", default="splits.json")
+    command.add_argument("--cache-dir", default="../../../chest_xray_cache")
+    command.add_argument("--size", type=int, default=224)
+
+  cache = commands.add_parser("cache")
+  shared(cache)
+  cache.add_argument("--data-dir", default="../../../chest_xray")
+  cache.add_argument("--overwrite", action="store_true")
+
+  eda = commands.add_parser("eda")
+  shared(eda)
+  eda.add_argument("--plot-out")
+  eda.add_argument("--skip-plots", action="store_true")
+
+  verify = commands.add_parser("verify-batch")
+  shared(verify)
+  verify.add_argument("--split", choices=SPLITS, default="train")
+  verify.add_argument("--batch-size", type=int, default=32)
+  verify.add_argument("--seed", type=int, default=0)
+  verify.add_argument("--hflip", action="store_true")
+  return parser.parse_args()
+
+
+def run_cache(args):
+  build_cache(
+      args.manifest, args.data_dir, args.cache_dir, args.size, args.overwrite
+  )
+
+
+def run_eda(args):
+  _, by_split = load_manifest(args.manifest)
+  rows = class_distribution(by_split)
+  means, mask, mu, sigma = intensity_outliers(
+      args.cache_dir, args.size, args.manifest
+  )
+  if args.plot_out or not args.skip_plots:
+    plot_eda(
+        rows, means, mask, mu, sigma,
+        out_path=args.plot_out,
+        show=not args.skip_plots,
+    )
+
+
+def first_batch(images, labels, args, training):
+  dataset = build_dataset(
+      images, labels, args.batch_size,
+      training=training, seed=args.seed, hflip=args.hflip,
+  )
+  return next(iter(dataset))
+
+
+def run_verify(args):
+  images, labels, _ = load_split(
+      args.cache_dir, args.size, args.split, args.manifest
+  )
+  training = args.split == "train"
+  batch_images, batch_labels = first_batch(images, labels, args, training)
+  batch_images = batch_images.numpy()
+  batch_labels = batch_labels.numpy()
+  print(f"split: {args.split} | samples: {len(images)} | training mode: {training}")
+  print(f"batch images: {batch_images.shape} {batch_images.dtype}")
+  print(f"pixel range after preprocess_input: [{batch_images.min():.1f}, {batch_images.max():.1f}]")
+  print(f"batch labels: normal {int((batch_labels == 0).sum())} | pneumonia {int((batch_labels == 1).sum())}")
+  print(f"class weights: {class_weights(labels)}")
+  again_images, again_labels = first_batch(images, labels, args, training)
+  same = np.array_equal(batch_images, again_images.numpy()) and np.array_equal(
+      batch_labels, again_labels.numpy()
+  )
+  print(f"same seed gives identical first batch: {same}")
+
+
 def main():
-    parser = argparse.ArgumentParser(
-        description="CLI tool to run dataset analysis, split loading, and dataset verification for Pediatric Pneumonia Chest X-Rays."
-    )
-    subparsers = parser.add_subparsers(dest="command", required=True)
-
-    eda_parser = subparsers.add_parser(
-        "eda",
-        help="Run exploratory data analysis (class distribution & pixel intensity outliers).",
-    )
-    eda_parser.add_argument(
-        "--data-dir",
-        type=str,
-        default="../../../chest_xray_final",
-        help="Path to the root dataset directory containing train/val/test splits.",
-    )
-    eda_parser.add_argument(
-        "--skip-plots",
-        action="store_true",
-        help="Run statistical computations and prints without displaying matplotlib windows.",
-    )
-
-    load_parser = subparsers.add_parser(
-        "load", help="Extract image paths and binary labels for a specific split."
-    )
-    load_parser.add_argument(
-        "--data-dir",
-        type=str,
-        default="../../../chest_xray_final",
-        help="Path to the root dataset directory.",
-    )
-    load_parser.add_argument(
-        "--split",
-        type=str,
-        choices=["train", "val", "test"],
-        default="train",
-        help="Target dataset split name.",
-    )
-
-    verify_parser = subparsers.add_parser(
-        "verify-batch",
-        help="Instantiate Keras Sequence and inspect a generated batch.",
-    )
-    verify_parser.add_argument(
-        "--data-dir",
-        type=str,
-        default="../../../chest_xray_final",
-        help="Path to the root dataset directory.",
-    )
-    verify_parser.add_argument(
-        "--split",
-        type=str,
-        choices=["train", "val", "test"],
-        default="train",
-        help="Dataset split to instantiate.",
-    )
-    verify_parser.add_argument(
-        "--img-size",
-        type=int,
-        default=448,
-        help="Target height/width for aspect-ratio padded resizing.",
-    )
-    verify_parser.add_argument(
-        "--batch-size",
-        type=int,
-        default=32,
-        help="Batch size for dataset sequence.",
-    )
-
-    args = parser.parse_args()
-
-    match args.command:
-        case "eda":
-
-            explorer = DatasetExploration(root_path=args.data_dir)
-            split_counts = explorer.compute_class_distribution()
-            mean_intensities, outlier_mask, mu, sigma, _ = explorer.analyze_pixel_intensities()
-            if not args.skip_plots:
-                explorer.plot_eda_dashboard(split_counts, mean_intensities, outlier_mask, mu, sigma)
-
-        case "load":
-            loader = SplitPathLoader(root_path=args.data_dir)
-            paths, labels = loader.get_paths_and_labels(args.split)
-            print(f"[{args.split.upper()} SET]")
-            print(f"Total samples loaded: {len(paths)}")
-            print(
-                f"Normal (0): {labels.count(0)} | Pneumonia (1): {labels.count(1)}"
-            )
-
-        case "verify-batch":
-            loader = SplitPathLoader(root_path=args.data_dir)
-            paths, labels = loader.get_paths_and_labels(args.split)
-            is_train = args.split == "train"
-            dataset = PneumoniaSequenceDataset(
-                paths,
-                labels,
-                img_size=args.img_size,
-                batch_size=args.batch_size,
-                is_training=is_train,
-            )
-            print(f"Total Batches: {len(dataset)}")
-            if len(dataset) > 0:
-                images, batch_labels = dataset[0]
-                print(f"Batch 0 Images Shape : {images.shape}")
-                print(f"Batch 0 Labels Shape : {batch_labels.shape}")
-                print(
-                    f"Pixel Range          : [{images.numpy().min():.2f}, {images.numpy().max():.2f}]"
-                )
+  args = parse_args()
+  if args.command == "cache":
+    run_cache(args)
+  elif args.command == "eda":
+    run_eda(args)
+  else:
+    run_verify(args)
 
 
 if __name__ == "__main__":
-    main()
+  main()

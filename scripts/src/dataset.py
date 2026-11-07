@@ -1,7 +1,7 @@
 # Usage (run from scripts/src, --data-dir must contain train/, val/, test/):
-#   python make_splits.py --data-dir ../../../chest_xray --mode audit
-#   python make_splits.py --data-dir ../../../chest_xray --mode group
-#   python make_splits.py --data-dir ../../../chest_xray --mode group --max-train-per-patient 3
+#   python dataset.py --data-dir ../../../chest_xray --mode audit
+#   python dataset.py --data-dir ../../../chest_xray --mode group
+#   python dataset.py --data-dir ../../../chest_xray --mode group --max-train-per-patient 3
 # Modes: audit = print counts only | group = keep all images, split by patient
 # Options: --seed 42  --ratios 0.70 0.15 0.15  --out path/to/splits.json
 # Output: splits.json (path, label, group, split per image); normal = 0, pneumonia = 1

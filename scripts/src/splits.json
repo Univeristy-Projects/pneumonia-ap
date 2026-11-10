@@ -14,25 +14,187 @@
   },
   "counts": {
    "train": {
-    "normal": 1109,
-    "pneumonia": 2998,
-    "groups": 1958
+    "normal": 1106,
+    "pneumonia": 2976,
+    "groups": 1957
    },
    "val": {
     "normal": 237,
-    "pneumonia": 638,
-    "groups": 409
+    "pneumonia": 637,
+    "groups": 411
    },
    "test": {
-    "normal": 237,
-    "pneumonia": 637,
-    "groups": 422
+    "normal": 236,
+    "pneumonia": 632,
+    "groups": 421
    }
   },
   "info": {
    "unmatched_names": 0,
    "exact_duplicate_files": 32,
-   "mixed_label_groups_dropped": 0
+   "mixed_label_groups_dropped": 0,
+   "duplicates_dropped": [
+    {
+     "path": "test/normal/NORMAL2-IM-0096-0001.jpeg",
+     "duplicate_of": "test/normal/NORMAL2-IM-0095-0001.jpeg",
+     "label": 0
+    },
+    {
+     "path": "test/normal/NORMAL2-IM-0173-0001-0002.jpeg",
+     "duplicate_of": "test/normal/NORMAL2-IM-0173-0001-0001.jpeg",
+     "label": 0
+    },
+    {
+     "path": "test/normal/NORMAL2-IM-0246-0001-0002.jpeg",
+     "duplicate_of": "test/normal/NORMAL2-IM-0246-0001-0001.jpeg",
+     "label": 0
+    },
+    {
+     "path": "test/pneumonia/person128_bacteria_607.jpeg",
+     "duplicate_of": "test/pneumonia/person128_bacteria_606.jpeg",
+     "label": 1
+    },
+    {
+     "path": "test/pneumonia/person134_bacteria_644.jpeg",
+     "duplicate_of": "test/pneumonia/person134_bacteria_643.jpeg",
+     "label": 1
+    },
+    {
+     "path": "test/pneumonia/person1661_virus_2873.jpeg",
+     "duplicate_of": "test/pneumonia/person1661_virus_2872.jpeg",
+     "label": 1
+    },
+    {
+     "path": "train/normal/NORMAL2-IM-0587-0001-0002.jpeg",
+     "duplicate_of": "train/normal/NORMAL2-IM-0587-0001-0001.jpeg",
+     "label": 0
+    },
+    {
+     "path": "train/pneumonia/person1159_virus_1945.jpeg",
+     "duplicate_of": "train/pneumonia/person1159_virus_1944.jpeg",
+     "label": 1
+    },
+    {
+     "path": "train/pneumonia/person124_virus_247.jpeg",
+     "duplicate_of": "train/pneumonia/person124_virus_246.jpeg",
+     "label": 1
+    },
+    {
+     "path": "train/pneumonia/person1261_virus_2148.jpeg",
+     "duplicate_of": "train/pneumonia/person1261_virus_2147.jpeg",
+     "label": 1
+    },
+    {
+     "path": "train/pneumonia/person1312_bacteria_3318.jpeg",
+     "duplicate_of": "train/pneumonia/person1312_bacteria_3317.jpeg",
+     "label": 1
+    },
+    {
+     "path": "train/pneumonia/person1343_bacteria_3414.jpeg",
+     "duplicate_of": "train/pneumonia/person1343_bacteria_3413.jpeg",
+     "label": 1
+    },
+    {
+     "path": "train/pneumonia/person1349_bacteria_3437.jpeg",
+     "duplicate_of": "train/pneumonia/person1349_bacteria_3436.jpeg",
+     "label": 1
+    },
+    {
+     "path": "train/pneumonia/person1372_bacteria_3502.jpeg",
+     "duplicate_of": "train/pneumonia/person1372_bacteria_3501.jpeg",
+     "label": 1
+    },
+    {
+     "path": "train/pneumonia/person1372_bacteria_3503.jpeg",
+     "duplicate_of": "train/pneumonia/person1372_bacteria_3501.jpeg",
+     "label": 1
+    },
+    {
+     "path": "train/pneumonia/person1430_bacteria_3696.jpeg",
+     "duplicate_of": "train/pneumonia/person1430_bacteria_3695.jpeg",
+     "label": 1
+    },
+    {
+     "path": "train/pneumonia/person1481_bacteria_3863.jpeg",
+     "duplicate_of": "train/pneumonia/person1481_bacteria_3862.jpeg",
+     "label": 1
+    },
+    {
+     "path": "train/pneumonia/person1481_bacteria_3865.jpeg",
+     "duplicate_of": "train/pneumonia/person1481_bacteria_3864.jpeg",
+     "label": 1
+    },
+    {
+     "path": "train/pneumonia/person1481_bacteria_3867.jpeg",
+     "duplicate_of": "train/pneumonia/person1481_bacteria_3866.jpeg",
+     "label": 1
+    },
+    {
+     "path": "train/pneumonia/person1496_bacteria_3910.jpeg",
+     "duplicate_of": "train/pneumonia/person1496_bacteria_3909.jpeg",
+     "label": 1
+    },
+    {
+     "path": "train/pneumonia/person1619_bacteria_4268.jpeg",
+     "duplicate_of": "train/pneumonia/person1619_bacteria_4267.jpeg",
+     "label": 1
+    },
+    {
+     "path": "train/pneumonia/person1628_bacteria_4298.jpeg",
+     "duplicate_of": "train/pneumonia/person1628_bacteria_4297.jpeg",
+     "label": 1
+    },
+    {
+     "path": "train/pneumonia/person162_virus_322.jpeg",
+     "duplicate_of": "train/pneumonia/person162_virus_321.jpeg",
+     "label": 1
+    },
+    {
+     "path": "train/pneumonia/person258_bacteria_1208.jpeg",
+     "duplicate_of": "train/pneumonia/person258_bacteria_1207.jpeg",
+     "label": 1
+    },
+    {
+     "path": "train/pneumonia/person258_bacteria_1209.jpeg",
+     "duplicate_of": "train/pneumonia/person258_bacteria_1207.jpeg",
+     "label": 1
+    },
+    {
+     "path": "train/pneumonia/person264_bacteria_1231.jpeg",
+     "duplicate_of": "train/pneumonia/person264_bacteria_1230.jpeg",
+     "label": 1
+    },
+    {
+     "path": "train/pneumonia/person266_bacteria_1238.jpeg",
+     "duplicate_of": "train/pneumonia/person266_bacteria_1237.jpeg",
+     "label": 1
+    },
+    {
+     "path": "train/pneumonia/person30_bacteria_157.jpeg",
+     "duplicate_of": "train/pneumonia/person30_bacteria_156.jpeg",
+     "label": 1
+    },
+    {
+     "path": "train/pneumonia/person357_virus_735.jpeg",
+     "duplicate_of": "train/pneumonia/person357_virus_734.jpeg",
+     "label": 1
+    },
+    {
+     "path": "train/pneumonia/person401_virus_798.jpeg",
+     "duplicate_of": "train/pneumonia/person401_virus_797.jpeg",
+     "label": 1
+    },
+    {
+     "path": "train/pneumonia/person688_virus_1282.jpeg",
+     "duplicate_of": "train/pneumonia/person688_virus_1281.jpeg",
+     "label": 1
+    },
+    {
+     "path": "train/pneumonia/person834_bacteria_2748.jpeg",
+     "duplicate_of": "train/pneumonia/person834_bacteria_2747.jpeg",
+     "label": 1
+    }
+   ]
   }
  },
  "records": [
@@ -370,7 +532,7 @@
    "path": "test/normal/IM-0089-0001.jpeg",
    "label": 0,
    "group": "0:im-0089",
-   "split": "train"
+   "split": "val"
   },
   {
    "path": "test/normal/IM-0091-0001.jpeg",
@@ -607,12 +769,6 @@
    "split": "val"
   },
   {
-   "path": "test/normal/NORMAL2-IM-0096-0001.jpeg",
-   "label": 0,
-   "group": "0:im-0095",
-   "split": "val"
-  },
-  {
    "path": "test/normal/NORMAL2-IM-0098-0001.jpeg",
    "label": 0,
    "group": "0:im-0098",
@@ -745,12 +901,6 @@
    "split": "train"
   },
   {
-   "path": "test/normal/NORMAL2-IM-0173-0001-0002.jpeg",
-   "label": 0,
-   "group": "0:im-0173",
-   "split": "train"
-  },
-  {
    "path": "test/normal/NORMAL2-IM-0195-0001.jpeg",
    "label": 0,
    "group": "0:im-0195",
@@ -866,12 +1016,6 @@
   },
   {
    "path": "test/normal/NORMAL2-IM-0246-0001-0001.jpeg",
-   "label": 0,
-   "group": "0:im-0246",
-   "split": "val"
-  },
-  {
-   "path": "test/normal/NORMAL2-IM-0246-0001-0002.jpeg",
    "label": 0,
    "group": "0:im-0246",
    "split": "val"
@@ -1957,12 +2101,6 @@
    "split": "test"
   },
   {
-   "path": "test/pneumonia/person128_bacteria_607.jpeg",
-   "label": 1,
-   "group": "1:person128",
-   "split": "test"
-  },
-  {
    "path": "test/pneumonia/person128_bacteria_608.jpeg",
    "label": 1,
    "group": "1:person128",
@@ -2060,12 +2198,6 @@
   },
   {
    "path": "test/pneumonia/person134_bacteria_643.jpeg",
-   "label": 1,
-   "group": "1:person134",
-   "split": "train"
-  },
-  {
-   "path": "test/pneumonia/person134_bacteria_644.jpeg",
    "label": 1,
    "group": "1:person134",
    "split": "train"
@@ -2744,12 +2876,6 @@
   },
   {
    "path": "test/pneumonia/person1661_virus_2872.jpeg",
-   "label": 1,
-   "group": "1:person1661",
-   "split": "train"
-  },
-  {
-   "path": "test/pneumonia/person1661_virus_2873.jpeg",
    "label": 1,
    "group": "1:person1661",
    "split": "train"
@@ -8305,12 +8431,6 @@
    "split": "train"
   },
   {
-   "path": "train/normal/NORMAL2-IM-0587-0001-0002.jpeg",
-   "label": 0,
-   "group": "0:im-0587",
-   "split": "train"
-  },
-  {
    "path": "train/normal/NORMAL2-IM-0587-0001.jpeg",
    "label": 0,
    "group": "0:im-0587",
@@ -10450,7 +10570,7 @@
    "path": "train/normal/NORMAL2-IM-1105-0001.jpeg",
    "label": 0,
    "group": "0:im-1105",
-   "split": "test"
+   "split": "val"
   },
   {
    "path": "train/normal/NORMAL2-IM-1106-0001.jpeg",
@@ -13585,12 +13705,6 @@
    "split": "train"
   },
   {
-   "path": "train/pneumonia/person1159_virus_1945.jpeg",
-   "label": 1,
-   "group": "1:person1159",
-   "split": "train"
-  },
-  {
    "path": "train/pneumonia/person1159_virus_1946.jpeg",
    "label": 1,
    "group": "1:person1159",
@@ -14719,12 +14833,6 @@
    "split": "train"
   },
   {
-   "path": "train/pneumonia/person124_virus_247.jpeg",
-   "label": 1,
-   "group": "1:person124",
-   "split": "train"
-  },
-  {
    "path": "train/pneumonia/person124_virus_249.jpeg",
    "label": 1,
    "group": "1:person124",
@@ -14858,12 +14966,6 @@
   },
   {
    "path": "train/pneumonia/person1261_virus_2147.jpeg",
-   "label": 1,
-   "group": "1:person1261",
-   "split": "train"
-  },
-  {
-   "path": "train/pneumonia/person1261_virus_2148.jpeg",
    "label": 1,
    "group": "1:person1261",
    "split": "train"
@@ -15553,12 +15655,6 @@
    "split": "train"
   },
   {
-   "path": "train/pneumonia/person1312_bacteria_3318.jpeg",
-   "label": 1,
-   "group": "1:person1312",
-   "split": "train"
-  },
-  {
    "path": "train/pneumonia/person1312_bacteria_3319.jpeg",
    "label": 1,
    "group": "1:person1312",
@@ -16045,12 +16141,6 @@
    "split": "train"
   },
   {
-   "path": "train/pneumonia/person1343_bacteria_3414.jpeg",
-   "label": 1,
-   "group": "1:person1343",
-   "split": "train"
-  },
-  {
    "path": "train/pneumonia/person1343_bacteria_3415.jpeg",
    "label": 1,
    "group": "1:person1343",
@@ -16190,12 +16280,6 @@
   },
   {
    "path": "train/pneumonia/person1349_bacteria_3436.jpeg",
-   "label": 1,
-   "group": "1:person1349",
-   "split": "train"
-  },
-  {
-   "path": "train/pneumonia/person1349_bacteria_3437.jpeg",
    "label": 1,
    "group": "1:person1349",
    "split": "train"
@@ -16490,18 +16574,6 @@
   },
   {
    "path": "train/pneumonia/person1372_bacteria_3501.jpeg",
-   "label": 1,
-   "group": "1:person1372",
-   "split": "train"
-  },
-  {
-   "path": "train/pneumonia/person1372_bacteria_3502.jpeg",
-   "label": 1,
-   "group": "1:person1372",
-   "split": "train"
-  },
-  {
-   "path": "train/pneumonia/person1372_bacteria_3503.jpeg",
    "label": 1,
    "group": "1:person1372",
    "split": "train"
@@ -17281,12 +17353,6 @@
    "split": "train"
   },
   {
-   "path": "train/pneumonia/person1430_bacteria_3696.jpeg",
-   "label": 1,
-   "group": "1:person1430",
-   "split": "train"
-  },
-  {
    "path": "train/pneumonia/person1430_bacteria_3697.jpeg",
    "label": 1,
    "group": "1:person1430",
@@ -17989,31 +18055,13 @@
    "split": "train"
   },
   {
-   "path": "train/pneumonia/person1481_bacteria_3863.jpeg",
-   "label": 1,
-   "group": "1:person1481",
-   "split": "train"
-  },
-  {
    "path": "train/pneumonia/person1481_bacteria_3864.jpeg",
    "label": 1,
    "group": "1:person1481",
    "split": "train"
   },
   {
-   "path": "train/pneumonia/person1481_bacteria_3865.jpeg",
-   "label": 1,
-   "group": "1:person1481",
-   "split": "train"
-  },
-  {
    "path": "train/pneumonia/person1481_bacteria_3866.jpeg",
-   "label": 1,
-   "group": "1:person1481",
-   "split": "train"
-  },
-  {
-   "path": "train/pneumonia/person1481_bacteria_3867.jpeg",
    "label": 1,
    "group": "1:person1481",
    "split": "train"
@@ -18302,12 +18350,6 @@
   },
   {
    "path": "train/pneumonia/person1496_bacteria_3909.jpeg",
-   "label": 1,
-   "group": "1:person1496",
-   "split": "train"
-  },
-  {
-   "path": "train/pneumonia/person1496_bacteria_3910.jpeg",
    "label": 1,
    "group": "1:person1496",
    "split": "train"
@@ -19825,12 +19867,6 @@
    "split": "train"
   },
   {
-   "path": "train/pneumonia/person1619_bacteria_4268.jpeg",
-   "label": 1,
-   "group": "1:person1619",
-   "split": "train"
-  },
-  {
    "path": "train/pneumonia/person1619_bacteria_4269.jpeg",
    "label": 1,
    "group": "1:person1619",
@@ -19903,12 +19939,6 @@
    "split": "train"
   },
   {
-   "path": "train/pneumonia/person1628_bacteria_4298.jpeg",
-   "label": 1,
-   "group": "1:person1628",
-   "split": "train"
-  },
-  {
    "path": "train/pneumonia/person1629_bacteria_4299.jpeg",
    "label": 1,
    "group": "1:person1629",
@@ -19928,12 +19958,6 @@
   },
   {
    "path": "train/pneumonia/person162_virus_321.jpeg",
-   "label": 1,
-   "group": "1:person162",
-   "split": "train"
-  },
-  {
-   "path": "train/pneumonia/person162_virus_322.jpeg",
    "label": 1,
    "group": "1:person162",
    "split": "train"
@@ -22033,18 +22057,6 @@
    "split": "test"
   },
   {
-   "path": "train/pneumonia/person258_bacteria_1208.jpeg",
-   "label": 1,
-   "group": "1:person258",
-   "split": "test"
-  },
-  {
-   "path": "train/pneumonia/person258_bacteria_1209.jpeg",
-   "label": 1,
-   "group": "1:person258",
-   "split": "test"
-  },
-  {
    "path": "train/pneumonia/person258_bacteria_1210.jpeg",
    "label": 1,
    "group": "1:person258",
@@ -22243,12 +22255,6 @@
    "split": "train"
   },
   {
-   "path": "train/pneumonia/person264_bacteria_1231.jpeg",
-   "label": 1,
-   "group": "1:person264",
-   "split": "train"
-  },
-  {
    "path": "train/pneumonia/person264_bacteria_1232.jpeg",
    "label": 1,
    "group": "1:person264",
@@ -22292,12 +22298,6 @@
   },
   {
    "path": "train/pneumonia/person266_bacteria_1237.jpeg",
-   "label": 1,
-   "group": "1:person266",
-   "split": "train"
-  },
-  {
-   "path": "train/pneumonia/person266_bacteria_1238.jpeg",
    "label": 1,
    "group": "1:person266",
    "split": "train"
@@ -23498,12 +23498,6 @@
   },
   {
    "path": "train/pneumonia/person30_bacteria_156.jpeg",
-   "label": 1,
-   "group": "1:person30",
-   "split": "train"
-  },
-  {
-   "path": "train/pneumonia/person30_bacteria_157.jpeg",
    "label": 1,
    "group": "1:person30",
    "split": "train"
@@ -24751,12 +24745,6 @@
    "split": "test"
   },
   {
-   "path": "train/pneumonia/person357_virus_735.jpeg",
-   "label": 1,
-   "group": "1:person357",
-   "split": "test"
-  },
-  {
    "path": "train/pneumonia/person357_virus_736.jpeg",
    "label": 1,
    "group": "1:person357",
@@ -25772,12 +25760,6 @@
   },
   {
    "path": "train/pneumonia/person401_virus_797.jpeg",
-   "label": 1,
-   "group": "1:person401",
-   "split": "val"
-  },
-  {
-   "path": "train/pneumonia/person401_virus_798.jpeg",
    "label": 1,
    "group": "1:person401",
    "split": "val"
@@ -31759,12 +31741,6 @@
    "split": "test"
   },
   {
-   "path": "train/pneumonia/person688_virus_1282.jpeg",
-   "label": 1,
-   "group": "1:person688",
-   "split": "test"
-  },
-  {
    "path": "train/pneumonia/person689_bacteria_2585.jpeg",
    "label": 1,
    "group": "1:person689",
@@ -33314,12 +33290,6 @@
   },
   {
    "path": "train/pneumonia/person834_bacteria_2747.jpeg",
-   "label": 1,
-   "group": "1:person834",
-   "split": "train"
-  },
-  {
-   "path": "train/pneumonia/person834_bacteria_2748.jpeg",
    "label": 1,
    "group": "1:person834",
    "split": "train"

@@ -2,7 +2,8 @@
 #   python dataset.py --data-dir ../../../chest_xray --mode audit
 #   python dataset.py --data-dir ../../../chest_xray --mode group
 #   python dataset.py --data-dir ../../../chest_xray --mode group --max-train-per-patient 3
-# Modes: audit = print counts only | group = keep all images, split by patient
+# Modes: audit = print counts only | group = split by patient
+# Byte-identical files are dropped (the first path alphabetically is kept) and listed in the output
 # Options: --seed 42  --ratios 0.70 0.15 0.15  --out path/to/splits.json
 # Output: splits.json (path, label, group, split per image); normal = 0, pneumonia = 1
 import argparse
@@ -80,7 +81,9 @@ def assign_groups(records, data_dir):
     record["group"] = key
     union.find(key)
     unmatched += not matched
-    by_hash[sha256_of(data_dir / record["path"])].append(key)
+    digest = sha256_of(data_dir / record["path"])
+    record["sha"] = digest
+    by_hash[digest].append(key)
   duplicate_files = 0
   for keys in by_hash.values():
     if len(keys) > 1:
@@ -99,6 +102,29 @@ def drop_mixed_label_groups(records):
   mixed = {group for group, found in labels.items() if len(found) > 1}
   kept = [r for r in records if r["group"] not in mixed]
   return kept, len(mixed)
+
+
+def drop_exact_duplicates(records):
+  first_seen = {}
+  kept, dropped = [], []
+  for record in records:
+    original = first_seen.setdefault(record["sha"], record)
+    if original is record:
+      kept.append(record)
+    else:
+      dropped.append({
+          "path": record["path"],
+          "duplicate_of": original["path"],
+          "label": record["label"],
+      })
+  return kept, dropped
+
+
+def report_duplicates(dropped):
+  names = {value: key for key, value in CLASSES.items()}
+  print(f"exact duplicate files dropped: {len(dropped)}")
+  for item in dropped:
+    print(f"  {names[item['label']]}: {item['path']} (same bytes as {item['duplicate_of']})")
 
 
 def split_groups(records, ratios, seed):
@@ -207,7 +233,10 @@ def main():
 
   info = assign_groups(records, data_dir)
   records, mixed = drop_mixed_label_groups(records)
+  records, dropped = drop_exact_duplicates(records)
   info["mixed_label_groups_dropped"] = mixed
+  info["duplicates_dropped"] = dropped
+  report_duplicates(dropped)
 
   if args.mode == "audit":
     audit(records, info)

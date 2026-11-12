@@ -35,11 +35,17 @@ def evaluate_multi_seed(data_dir: str, model_pattern: str = "pneumonia_model_see
     xts, yts = load_split(data_dir, "test")
     test_ds = build_dataset(xts, yts, batch_size=batch_size)
 
-    model_files = sorted(list(Path(".").glob(model_pattern)))
-    if not model_files:
-        raise FileNotFoundError(f"No model files found matching pattern: {model_pattern}")
+    if args.model_name == "residual_cnn":
+        file_pattern = f"pneumonia_{args.model_name}_b{args.num_blocks}_seed*.keras"
+    else:
+        file_pattern = f"pneumonia_{args.model_name}_seed*.keras"
 
-    print(f"\nFound {len(model_files)} seed models to evaluate: {[f.name for f in model_files]}")
+    model_paths = sorted(glob.glob(file_pattern))
+
+    if not model_paths:
+        raise FileNotFoundError(f"No model files found matching pattern: {file_pattern}")
+
+    print(f"Found {len(model_paths)} models to evaluate for architecture: {args.model_name}")
 
     recalls = []
     precisions = []
@@ -49,7 +55,7 @@ def evaluate_multi_seed(data_dir: str, model_pattern: str = "pneumonia_model_see
     last_y_pred = None
     last_cm = None
 
-    for model_path in model_files:
+    for model_path in model_paths:
         print(f"\nEvaluating {model_path.name}...")
         model = tf.keras.models.load_model(model_path)
 
@@ -127,17 +133,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Multi-seed evaluation script with Student-t confidence intervals."
     )
+    parser.add_argument("--model_name", default="build_simple_cnn", help="Architecture name to evaluate")
+    parser.add_argument("--num_blocks", type=int, default=2, help="Number of blocks if evaluating residual_cnn")
     parser.add_argument(
         "--data_dir",
         type=str,
         default="../../../chest_xray_cache",
         help="Path to directory containing test split.",
-    )
-    parser.add_argument(
-        "--model_pattern",
-        type=str,
-        default="pneumonia_model_seed*.keras",
-        help="Glob pattern for saved seed models.",
     )
     parser.add_argument(
         "--batch_size", type=int, default=32, help="Batch size for evaluation."
@@ -149,3 +151,4 @@ if __name__ == "__main__":
         model_pattern=args.model_pattern,
         batch_size=args.batch_size,
     )
+

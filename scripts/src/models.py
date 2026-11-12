@@ -34,8 +34,8 @@ def residual_block(x, filters):
     return tf.keras.layers.LeakyReLU(alpha=0.01)(out)
 
 
-def build_residual_cnn(input_shape):
-    """Deeper custom Residual CNN built from scratch."""
+def build_residual_cnn(input_shape, num_blocks=2):
+    """Deeper custom Residual CNN with configurable block depth."""
     inputs = tf.keras.layers.Input(shape=input_shape)
 
     # Initial feature extraction
@@ -43,15 +43,13 @@ def build_residual_cnn(input_shape):
     x = tf.keras.layers.LeakyReLU(alpha=0.01)(x)
     x = tf.keras.layers.MaxPooling2D((2, 2))(x)
 
-    # Scale 1
-    x = residual_block(x, 64)
-    x = tf.keras.layers.MaxPooling2D((2, 2))(x)
+    # Dynamically scale residual blocks and filters
+    filters = 64
+    for _ in range(num_blocks):
+        x = residual_block(x, filters)
+        x = tf.keras.layers.MaxPooling2D((2, 2))(x)
+        filters = min(filters * 2, 256)  # Scale filters up, capped at 256
 
-    # Scale 2
-    x = residual_block(x, 128)
-    x = tf.keras.layers.MaxPooling2D((2, 2))(x)
-
-    # Global pooling instead of dense flattening for parameter efficiency
     x = tf.keras.layers.GlobalAveragePooling2D()(x)
     x = tf.keras.layers.Dropout(0.4)(x)
     outputs = tf.keras.layers.Dense(1, activation="sigmoid")(x)

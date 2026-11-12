@@ -118,12 +118,11 @@ def build_dataset(images, labels, batch_size, training=False, seed=0, hflip=Fals
 
   def prepare(index, item):
     image, label = item
-    image = tf.cast(image[..., tf.newaxis], tf.float32)
+    image = tf.cast(image[..., tf.newaxis], tf.float32)  # (H, W, 1), 0-255
     if training:
       step_seed = tf.stack([tf.constant(seed, tf.int64), index])
-      image = augment(image, step_seed, hflip)
-    image = tf.image.grayscale_to_rgb(image)
-    image = keras.applications.resnet50.preprocess_input(image)
+      image = augment(image, step_seed, hflip)  # augment on the 0-255 scale
+    image = image / 255.0  # scale to 0-1 after augmenting
     return image, tf.cast(label, tf.float32)
 
   dataset = dataset.map(

@@ -1,0 +1,8 @@
+.idea/
+__pycache__/
+
+
+*.keras
+*.h5
+*.pt
+*.weights

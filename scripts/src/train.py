@@ -2,7 +2,7 @@ import argparse
 import tensorflow as tf
 from loader import load_split
 from preprocess import build_dataset, class_weights
-
+from models import MODEL_REGISTRY
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -10,21 +10,8 @@ def parse_args():
     parser.add_argument("--epochs", type=int, default=20)
     parser.add_argument("--batch_size", type=int, default=64)
     parser.add_argument("--data_dir", default="../../../chest_xray_cache")
+    parser.add_argument("--model_name", type=str, default="build_simple_cnn", help="Model Architecture to train")
     return parser.parse_args()
-
-
-def build_model(input_shape):
-    return tf.keras.Sequential([
-        tf.keras.layers.Input(shape=input_shape),
-        tf.keras.layers.Conv2D(32, (3, 3), activation="relu"),
-        tf.keras.layers.MaxPooling2D((2, 2)),
-        tf.keras.layers.Conv2D(64, (3, 3), activation="relu"),
-        tf.keras.layers.MaxPooling2D((2, 2)),
-        tf.keras.layers.Conv2D(128, (3, 3), activation="relu"),
-        tf.keras.layers.Dropout(0.3),
-        tf.keras.layers.Flatten(),
-        tf.keras.layers.Dense(1, activation="sigmoid"),
-    ])
 
 
 def main():
@@ -41,7 +28,16 @@ def main():
     weights = class_weights(ytr)
     print(f"Class Weights: {weights}")
 
-    model = build_model(xtr.shape[1:] + (1,))           # (H, W, 1)
+    input_shape = xtr.shape[1:] + (1,)
+    if args.model_name not in MODEL_REGISTRY:
+        raise ValueError(
+            f"Unknown model architecture '{args.model_name}'. "
+            f"Available options are: {list(MODEL_REGISTRY.keys())}"
+        )
+
+    model_builder = MODEL_REGISTRY[args.model_name]
+    model = model_builder(input_shape)
+
     model.compile(
         optimizer=tf.keras.optimizers.Nadam(learning_rate=0.001),
         loss="binary_crossentropy",

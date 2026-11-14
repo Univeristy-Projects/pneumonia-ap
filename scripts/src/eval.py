@@ -6,7 +6,7 @@ import seaborn as sns
 from scipy import stats
 from sklearn.metrics import classification_report, confusion_matrix, precision_score, recall_score, roc_auc_score
 import tensorflow as tf
-
+import glob
 from loader import load_split
 from preprocess import build_dataset
 
@@ -30,7 +30,7 @@ def compute_student_t_ci(values, confidence=0.95):
     return mean, mean - margin, mean + margin, margin
 
 
-def evaluate_multi_seed(data_dir: str, model_pattern: str = "pneumonia_model_seed*.keras", batch_size: int = 32):
+def evaluate_multi_seed(data_dir: str, model_name: str, num_blocks: int = 2, batch_size: int = 32):
     print(f"Loading test data from: {Path(data_dir) / 'test'}")
     xts, yts = load_split(data_dir, "test")
     test_ds = build_dataset(xts, yts, batch_size=batch_size)
@@ -56,7 +56,7 @@ def evaluate_multi_seed(data_dir: str, model_pattern: str = "pneumonia_model_see
     last_cm = None
 
     for model_path in model_paths:
-        print(f"\nEvaluating {model_path.name}...")
+        print(f"\nEvaluating {model_path}...")
         model = tf.keras.models.load_model(model_path)
 
         y_true = []
@@ -87,7 +87,7 @@ def evaluate_multi_seed(data_dir: str, model_pattern: str = "pneumonia_model_see
 
     # --- Student-t Confidence Intervals across n = 5 runs ---
     print("\n" + "=" * 50)
-    print(f"--- Multi-Seed Evaluation Summary (n = {len(model_files)}) ---")
+    print(f"--- Multi-Seed Evaluation Summary (n = {len(model_paths)}) ---")
     print("=" * 50)
 
     metrics = {
@@ -95,19 +95,30 @@ def evaluate_multi_seed(data_dir: str, model_pattern: str = "pneumonia_model_see
         "Precision (Pneumonia)": precisions,
         "ROC-AUC": aucs
     }
-
+    report_lines=[]
     ci_results = {}
     for name, vals in metrics.items():
         mean, lower, upper, margin = compute_student_t_ci(vals)
         ci_results[name] = {"mean": mean, "lower": lower, "upper": upper, "margin": margin}
         print(f"{name:<22}: {mean:.4f}  (95% CI: [{lower:.4f}, {upper:.4f}] | ±{margin:.4f})")
+        report_lines.append(f"{name:<22}: {mean:.4f}  (95% CI: [{lower:.4f}, {upper:.4f}] | ±{margin:.4f})")
 
     print("=" * 50)
-
+    if model_name == "residual_cnn":
+        model_tag = f"{model_name}_b{num_blocks}"
+    else:
+        model_tag = model_name
 
     target_names = ["Normal (0)", "Pneumonia (1)"]
     print("\nClassification Report (Last Seed Run):")
+    report_lines.append("\nClassification Report (Last Seed Run):")
     print(classification_report(last_y_true, last_y_pred, target_names=target_names))
+    report_lines.append(classification_report(last_y_true, last_y_pred, target_names=target_names))
+    full_report = "\n".join(report_lines)
+    txt_path = f"{model_tag}.txt"
+    with open(txt_path, "w", encoding="utf-8") as f:
+        f.write(full_report + "\n")
+    print(f"Evaluation report saved successfully to {txt_path}")
 
     plt.figure(figsize=(6, 5))
     sns.heatmap(
@@ -123,7 +134,7 @@ def evaluate_multi_seed(data_dir: str, model_pattern: str = "pneumonia_model_see
     plt.title("Confusion Matrix - Multi-Seed Test Sample")
     plt.tight_layout()
 
-    plot_path = "confusion_matrix.png"
+    plot_path = f"{model_tag}_confusion_matrix.png"
     plt.savefig(plot_path)
     print(f"\nConfusion matrix plot saved successfully to {plot_path}")
     plt.show()
@@ -133,7 +144,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Multi-seed evaluation script with Student-t confidence intervals."
     )
-    parser.add_argument("--model_name", default="build_simple_cnn", help="Architecture name to evaluate")
+    parser.add_argument("--model_name", default="simple_cnn", help="Architecture name to evaluate")
     parser.add_argument("--num_blocks", type=int, default=2, help="Number of blocks if evaluating residual_cnn")
     parser.add_argument(
         "--data_dir",
@@ -148,7 +159,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     evaluate_multi_seed(
         data_dir=args.data_dir,
-        model_pattern=args.model_pattern,
+        model_name=args.model_name,
+        num_blocks=args.num_blocks,
         batch_size=args.batch_size,
     )
 

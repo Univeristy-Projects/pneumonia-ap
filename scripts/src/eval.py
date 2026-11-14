@@ -4,12 +4,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 from scipy import stats
-from sklearn.metrics import classification_report, confusion_matrix, precision_score, recall_score, roc_auc_score
+from sklearn.metrics import classification_report, confusion_matrix, precision_score, recall_score, roc_auc_score,roc_curve
 import tensorflow as tf
 import glob
 from loader import load_split
 from preprocess import build_dataset
-
+from models import LayerScale
 
 def compute_student_t_ci(values, confidence=0.95):
     """Computes mean and Student-t confidence interval for n runs:
@@ -34,8 +34,8 @@ def evaluate_multi_seed(data_dir: str, model_name: str, num_blocks: int = 2, bat
     print(f"Loading test data from: {Path(data_dir) / 'test'}")
     xts, yts = load_split(data_dir, "test")
     test_ds = build_dataset(xts, yts, batch_size=batch_size)
-
-    if args.model_name == "residual_cnn":
+    block_based_models = ["residual_cnn", "convnext"]
+    if args.model_name in block_based_models:
         file_pattern = f"pneumonia_{args.model_name}_b{args.num_blocks}_seed*.keras"
     else:
         file_pattern = f"pneumonia_{args.model_name}_seed*.keras"
@@ -69,7 +69,11 @@ def evaluate_multi_seed(data_dir: str, model_name: str, num_blocks: int = 2, bat
 
         y_true = np.array(y_true, dtype=int)
         y_pred_probs = np.array(y_pred_probs)
-        y_pred = (y_pred_probs >= 0.5).astype(int)
+        fpr, tpr, thresholds = roc_curve(y_true, y_pred_probs)
+        youden_j = tpr - fpr
+        optimal_idx = np.argmax(youden_j)
+        optimal_threshold = thresholds[optimal_idx]
+        y_pred = (y_pred_probs >= optimal_threshold).astype(int)
 
 
         rec = recall_score(y_true, y_pred, pos_label=1, zero_division=0)
@@ -104,7 +108,7 @@ def evaluate_multi_seed(data_dir: str, model_name: str, num_blocks: int = 2, bat
         report_lines.append(f"{name:<22}: {mean:.4f}  (95% CI: [{lower:.4f}, {upper:.4f}] | ±{margin:.4f})")
 
     print("=" * 50)
-    if model_name == "residual_cnn":
+    if model_name in block_based_models:
         model_tag = f"{model_name}_b{num_blocks}"
     else:
         model_tag = model_name

@@ -3,6 +3,7 @@ import tensorflow as tf
 from loader import load_split
 from preprocess import build_dataset, class_weights
 from models import MODEL_REGISTRY
+import numpy as np
 
 
 def get_optimizer(optimizer_name: str, learning_rate: float):
@@ -65,25 +66,31 @@ def main():
         )
 
     model_builder = MODEL_REGISTRY[args.model_name]
-    if args.model_name == "residual_cnn":
+
+    block_based_models = ["residual_cnn", "convnext"]
+
+    if args.model_name in block_based_models:
         model = model_builder(input_shape, num_blocks=args.num_blocks)
     else:
         model = model_builder(input_shape)
 
+    
     optimizer = get_optimizer(args.optimizer, learning_rate=args.lr)
-
+    loss = tf.keras.losses.BinaryCrossentropy(label_smoothing=0.1)
     model.compile(
         optimizer=optimizer,
-        loss="binary_crossentropy",
+        loss=loss,
         metrics=["accuracy", tf.keras.metrics.AUC(name="auc")],
     )
 
-    callbacks = [tf.keras.callbacks.EarlyStopping(
-        monitor="val_loss", patience=5, restore_best_weights=True)]
+    callbacks = [
+        tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=10, restore_best_weights=True),
+        tf.keras.callbacks.ReduceLROnPlateau(monitor="val_auc", mode="max", factor=0.5, patience=2)
+    ]
     model.fit(train_ds, validation_data=val_ds, class_weight=weights,
               epochs=args.epochs, callbacks=callbacks)
 
-    if args.model_name == "residual_cnn":
+    if args.model_name in block_based_models:
         save_filename = f"pneumonia_{args.model_name}_b{args.num_blocks}_seed{args.seed}.keras"
     else:
         save_filename = f"pneumonia_{args.model_name}_seed{args.seed}.keras"

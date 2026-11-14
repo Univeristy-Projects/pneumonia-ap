@@ -1,0 +1,14 @@
+Recall (Pneumonia)    : 0.8932  (95% CI: [0.8697, 0.9168] | ±0.0236)
+Precision (Pneumonia) : 0.9583  (95% CI: [0.9501, 0.9665] | ±0.0082)
+ROC-AUC               : 0.9515  (95% CI: [0.9452, 0.9578] | ±0.0063)
+
+Classification Report (Last Seed Run):
+               precision    recall  f1-score   support
+
+   Normal (0)       0.80      0.89      0.84       237
+Pneumonia (1)       0.96      0.92      0.94       637
+
+     accuracy                           0.91       874
+    macro avg       0.88      0.90      0.89       874
+ weighted avg       0.91      0.91      0.91       874
+

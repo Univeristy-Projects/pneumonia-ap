@@ -16,6 +16,31 @@ def build_simple_cnn(input_shape):
     ])
 
 
+def build_light_cnn(input_shape, augment=True, leaky=False):
+    L = tf.keras.layers
+
+    def conv(filters, k):
+        if leaky:
+            return [L.Conv2D(filters, k), L.LeakyReLU(0.01)]
+        return [L.Conv2D(filters, k, activation="relu")]
+
+    aug = [L.RandomRotation(12 / 360, fill_mode="nearest"),
+           L.RandomZoom(0.15, fill_mode="nearest"),
+           L.RandomTranslation(0.15, 0.15, fill_mode="nearest")] if augment else []
+
+    return tf.keras.Sequential([
+        L.Input(shape=input_shape), *aug,
+        *conv(16, 5), *conv(16, 5), L.MaxPooling2D(3),
+        *conv(32, 5), *conv(32, 5), L.MaxPooling2D(3),
+        *conv(64, 3), *conv(64, 3), L.MaxPooling2D(2),
+        *conv(128, 3), *conv(128, 3), L.MaxPooling2D(2),
+        L.Flatten(),
+        L.Dense(128, activation="relu"),
+        L.Dropout(0.2),
+        L.Dense(1, activation="sigmoid"),
+    ], name="light_cnn")
+
+
 def residual_block(x, filters):
     """Custom Residual Block with skip connections and Leaky ReLU."""
     shortcut = x
@@ -125,5 +150,6 @@ MODEL_REGISTRY = {
     "simple_cnn": build_simple_cnn,
     "residual_cnn": build_residual_cnn,
     "convnext": build_convnext,
+    "light_cnn" : build_light_cnn,
 
 }

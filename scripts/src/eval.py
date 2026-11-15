@@ -36,9 +36,9 @@ def evaluate_multi_seed(data_dir: str, model_name: str, num_blocks: int = 2, bat
     test_ds = build_dataset(xts, yts, batch_size=batch_size)
     block_based_models = ["residual_cnn", "convnext"]
     if args.model_name in block_based_models:
-        file_pattern = f"pneumonia_{args.model_name}_b{args.num_blocks}_seed*.keras"
+        file_pattern = f"models/pneumonia_{args.model_name}_b{args.num_blocks}_seed*.keras"
     else:
-        file_pattern = f"pneumonia_{args.model_name}_seed*.keras"
+        file_pattern = f"models/pneumonia_{args.model_name}_seed*.keras"
 
     model_paths = sorted(glob.glob(file_pattern))
 
@@ -73,7 +73,7 @@ def evaluate_multi_seed(data_dir: str, model_name: str, num_blocks: int = 2, bat
         youden_j = tpr - fpr
         optimal_idx = np.argmax(youden_j)
         optimal_threshold = thresholds[optimal_idx]
-        y_pred = (y_pred_probs >= optimal_threshold).astype(int)
+        y_pred = (y_pred_probs >= 0.37).astype(int)
 
 
         rec = recall_score(y_true, y_pred, pos_label=1, zero_division=0)

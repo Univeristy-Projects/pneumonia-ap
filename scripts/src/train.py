@@ -34,7 +34,7 @@ def get_optimizer(optimizer_name: str, learning_rate: float):
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument("--epochs", type=int, default=20)
+    parser.add_argument("--epochs", type=int, default=30)
     parser.add_argument("--batch_size", type=int, default=64)
     parser.add_argument("--data_dir", default="../../../chest_xray_cache")
     parser.add_argument("--model_name", type=str, default="simple_cnn", help="Model Architecture to train")
@@ -84,16 +84,16 @@ def main():
     )
 
     callbacks = [
-        tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=10, restore_best_weights=True),
-        tf.keras.callbacks.ReduceLROnPlateau(monitor="val_auc", mode="max", factor=0.5, patience=2)
+        tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=8, restore_best_weights=True),
+        tf.keras.callbacks.ReduceLROnPlateau(monitor="val_auc", mode="max", factor=0.5, patience=5)
     ]
     model.fit(train_ds, validation_data=val_ds, class_weight=weights,
               epochs=args.epochs, callbacks=callbacks)
 
     if args.model_name in block_based_models:
-        save_filename = f"pneumonia_{args.model_name}_b{args.num_blocks}_seed{args.seed}.keras"
+        save_filename = f"models/pneumonia_{args.model_name}_b{args.num_blocks}_seed{args.seed}.keras"
     else:
-        save_filename = f"pneumonia_{args.model_name}_seed{args.seed}.keras"
+        save_filename = f"models/pneumonia_{args.model_name}_seed{args.seed}.keras"
     model.save(save_filename)
     print(f"[INFO] Model successfully saved to: {save_filename}")
 

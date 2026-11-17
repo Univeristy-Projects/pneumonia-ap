@@ -119,9 +119,9 @@ def convnext_block(x, dim, drop_rate=0.0):
     return layers.add([shortcut, x])
 
 
-def build_convnext(input_shape, num_blocks=3, dims=(32, 64, 128, 256), drop_path=0.0):
+def build_convnext(input_shape, num_blocks=3, dims=(48, 96, 192, 384), drop_path=0.0):
     """Small ConvNeXt. num_blocks = depth of stage 3 (the deepest stage)."""
-    depths = (1, 1, num_blocks, 1)
+    depths = (1, 2, num_blocks, 1)
     rates = np.linspace(0.0, drop_path, sum(depths))
     inputs = layers.Input(shape=input_shape)
 

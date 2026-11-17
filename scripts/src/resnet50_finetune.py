@@ -59,7 +59,6 @@ def compile_model(model, learning_rate):
             "accuracy",
             tf.keras.metrics.AUC(name="auc"),
             tf.keras.metrics.Precision(name="precision"),
-    parser.add_argument("--fine_tune_lr", type=float, default=1e-5)
             tf.keras.metrics.Recall(name="recall"),
         ],
     )
@@ -71,20 +70,22 @@ def main():
     parser.add_argument("--epochs", type=int, default=30)
     parser.add_argument("--batch_size", type=int, default=64)
     parser.add_argument("--lr", type=float, default=1e-4)
+    parser.add_argument("--fine_tune_lr", type=float, default=1e-5)
     parser.add_argument(
         "--fine_tune_at",
         type=int,
         default=None,
         help="Optional layer index; defaults to the start of ResNet50 conv5",
     )
+    parser.add_argument("--warmup_epochs", type=int, default=3)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument(
         "--output",
         default=None,
-        help="Output path; defaults to pneumonia_residual_cnn_b50_seed{seed}.keras",
+        help="Output path; defaults to models/pneumonia_residual_cnn_b50_seed{seed}.keras",
     )
     args = parser.parse_args()
-    output_path = args.output or f"pneumonia_residual_cnn_b50_seed{args.seed}.keras"
+    output_path = args.output or f"models/pneumonia_residual_cnn_b50_seed{args.seed}.keras"
 
     tf.keras.utils.set_random_seed(args.seed)
 
@@ -99,10 +100,10 @@ def main():
     model = build_model(x_train.shape[1:] + (1,), args.fine_tune_at)
     callbacks = [
         tf.keras.callbacks.EarlyStopping(
-            monitor="val_auc", mode="max", patience=8, restore_best_weights=True
+            monitor="val_loss", mode="max", patience=8, restore_best_weights=True
         ),
         tf.keras.callbacks.ReduceLROnPlateau(
-            monitor="val_loss", factor=0.2, patience=2, min_lr=1e-7
+            monitor="val_auc", factor=0.5, patience=5, min_lr=1e-7
         ),
     ]
 

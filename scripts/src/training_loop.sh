@@ -10,7 +10,8 @@ echo "========================================"
 for seed in {42..46}; do
 
     python3 train.py \
-        --model_name simple_cnn \
+        --model_name convnext \
+        --num_blocks 3 \
         --seed "$seed"
         
     echo "Finished seed $seed successfully."

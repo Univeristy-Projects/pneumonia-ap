@@ -1,6 +1,7 @@
 """Aggregate the per-seed pilot records written by train.py (runs/*.json).
 
 For every candidate it reports mean ± 95% Student-t margin over the seeds
+(s_bar ± t_{n-1} * sigma / sqrt(n), Section 11.3 of the report) for validation
 recall, precision and ROC-AUC, plus mean best epoch, training time and latency.
 Writes runs/pilot_table.txt and one combined learning-curve figure.
 """
@@ -41,6 +42,11 @@ def fmt(values, digits=4):
     return f"{m:.{digits}f} ± {h:.{digits}f}" if not math.isnan(h) else f"{m:.{digits}f}"
 
 
+def _mean_or_dash(values, fmt):
+    vals = [v for v in values if v is not None]
+    return f"{np.mean(vals):{fmt}}" if vals else "—"
+
+
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--runs_dir", default="runs")
@@ -65,13 +71,13 @@ def main():
             fmt([r["val_recall"] for r in recs]),
             fmt([r["val_precision"] for r in recs]),
             fmt([r["val_roc_auc"] for r in recs]),
-            f"{np.mean([r['best_epoch'] for r in recs]):.1f}",
-            f"{np.mean([r['train_minutes'] for r in recs]):.1f}",
+            _mean_or_dash([r['best_epoch'] for r in recs], ".1f"),
+            _mean_or_dash([r['train_minutes'] for r in recs], ".1f"),
             f"{np.mean([r['latency_ms_per_img'] for r in recs]):.2f}",
         ])
     widths = [max(len(header[i]), *(len(r[i]) for r in rows)) for i in range(len(header))]
     line = lambda r: "  ".join(c.ljust(w) for c, w in zip(r, widths))
-    text = ["Validation metrics: mean ± 95% Student-t margin over seeds (threshold 0.4, restored best epoch)",
+    text = ["Validation metrics: mean ± 95% Student-t margin over seeds (threshold 0.5, restored best epoch)",
             "", line(header), line(["-" * w for w in widths])] + [line(r) for r in rows]
     (runs / "pilot_table.txt").write_text("\n".join(text) + "\n")
 
@@ -80,10 +86,15 @@ def main():
     cols = 2
     fig, axes = plt.subplots(math.ceil(n / cols), cols, figsize=(10, 3.6 * math.ceil(n / cols)), squeeze=False)
     for ax, (name, recs) in zip(axes.ravel(), groups.items()):
-        length = max(len(r["history"]["loss"]) for r in recs)
+        recs_with_hist = [r for r in recs if r.get("history", {}).get("loss")]
+        if not recs_with_hist:
+            ax.text(0.5, 0.5, "no history", ha="center", va="center", transform=ax.transAxes)
+            ax.set_title(f"{name} (n = {len(recs)})")
+            continue
+        length = max(len(r["history"]["loss"]) for r in recs_with_hist)
         for key, label in [("loss", "train"), ("val_loss", "validation")]:
-            arr = np.full((len(recs), length), np.nan)
-            for i, r in enumerate(recs):
+            arr = np.full((len(recs_with_hist), length), np.nan)
+            for i, r in enumerate(recs_with_hist):
                 arr[i, :len(r["history"][key])] = r["history"][key]
             m, s = np.nanmean(arr, axis=0), np.nanstd(arr, axis=0)
             x = np.arange(1, length + 1)

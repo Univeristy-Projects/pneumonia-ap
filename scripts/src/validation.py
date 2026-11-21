@@ -162,7 +162,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Multi-seed VALIDATION evaluation script with Student-t confidence intervals."
     )
-    parser.add_argument("--model_name", default="convnext", help="Architecture name to evaluate")
+    parser.add_argument("--model_name", default="simple_cnn", help="Architecture name to evaluate")
     parser.add_argument("--num_blocks", type=int, default=3, help="Number of blocks for residual_cnn / convnext")
     parser.add_argument(
         "--data_dir",

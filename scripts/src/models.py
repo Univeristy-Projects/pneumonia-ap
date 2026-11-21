@@ -16,7 +16,7 @@ def build_simple_cnn(input_shape):
     ])
 
 
-def build_light_cnn(input_shape, augment=True, leaky=False):
+def build_light_cnn(input_shape, augment=False, leaky=False):
     L = tf.keras.layers
 
     def conv(filters, k):
